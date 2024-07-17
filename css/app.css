@@ -2262,11 +2262,23 @@ main >.inner {
   top: -10%;
   left: -10%;
 }
-.social .item.::before {
-  background-color: ;
+.social .item.facebook::before {
+  background-color: aceboo;
 }
-.social .item. i {
-  color: ;
+.social .item.facebook i {
+  color: aceboo;
+}
+.social .item.instagram::before {
+  background-color: nstagra;
+}
+.social .item.instagram i {
+  color: nstagra;
+}
+.social .item.vocus::before {
+  background-color: ocu;
+}
+.social .item.vocus i {
+  color: ocu;
 }
 .social .item:focus i,
 .social .item:hover i {

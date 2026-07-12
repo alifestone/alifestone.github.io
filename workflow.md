@@ -27,7 +27,7 @@
    - 文章列表.dc.html（分類/tag 篩選 chip + 空狀態 + 分頁）
    - 關於我.dc.html（個人區塊 + 我在做什麼四卡 + 技能標籤 + 時間線）
    - 404.dc.html（迷路 Slimo 彩蛋：SLIME_LOST 精靈 + 融化水漬 + 戳一下彈跳）
-   - 原始 .dc.html 已存進 design-reference/ 作為交接參照。
+   - 原始 .dc.html 保存在 Claude Design 專案，需要時用 DesignSync 拉下。
 
 階段3：（匯出與交接 — 已用 Astro 落地）
 1. 技術選型：**Astro**（靜態網站產生器；Markdown/MDX + content collections，原生支援 tag 與圖片最佳化）。
@@ -42,9 +42,21 @@
      title/date/category/tags/excerpt/cover），tag 直接改 frontmatter 陣列。
    - src/pages/：index / posts/index（列表 + 篩選）/ posts/[...slug]（單篇 + 目錄）/ about / 404 / projects。
 3. 本地驗證通過：npm run build 產出 6 頁；light/dark 切換、wipe、爬行 Slimo、Markdown 渲染、
-   404 彩蛋、列表篩選皆正常。首頁.html 與 design-reference/ 不進 build（設計參照）。
+   404 彩蛋、列表篩選皆正常。首頁.html 不進 build（設計參照）。
 
-尚待進行：
-- 階段5/6：GitHub Actions 部署 workflow（withastro/action + deploy-pages），
-  並到 repo Settings → Pages 把 Source 設為 GitHub Actions。（本輪未做）
+階段5：（部署到 GitHub Pages — 完成）
+1. 網域：用 github.io 子網域 https://alifestone.github.io（未建 CNAME）。
+   astro.config.mjs 的 site 已設為此網址（user site，無 base）。
+2. 已建立 .github/workflows/deploy.yml：withastro/action@v3 build → actions/deploy-pages@v4 部署，
+   觸發於 push 到 main（也可在 Actions 頁面手動 workflow_dispatch）。
+3. commit 4f424b9 push 到 main 後，Actions run 綠燈（build ✓ / deploy ✓）。
+   線上驗證：https://alifestone.github.io/ 回 200 並為新 Astro 站；
+   /posts/hello-world/ 亦回 200。
+   （唯一提示為 Node 20 deprecation 的無害通知。）
+4. 之後更新流程：git push 到 main 即自動 build + 部署；新增文章 = 在 src/content/posts/ 加 .md 後 push。
+
+尚待進行（可選）：
+- 階段6（CI/CD 進階）：核心「push 自動部署」已由階段5 workflow 達成；
+  若要加強可在 build 前跑 astro check 型別檢查。
 - 把首頁舊的 inline demo 文章逐步改寫成正式 Markdown 文章。
+- projects.astro 目前為佔位頁，之後補內容。

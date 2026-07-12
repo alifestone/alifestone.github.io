@@ -54,36 +54,88 @@ const tags = collectTags(posts).slice(0, 8);
       <p class="px fs16 m0">404: no posts found</p>
       <p class="sub fs13 m0 mt8">這個篩選組合下沒有文章，換個條件試試。</p>
     </div>
+
+    <div class="pager" id="pager"></div>
   </main>
 </BaseLayout>
 
 <script>
+  const PAGE_SIZE = 6;
   const grid = document.getElementById('postGrid');
   const empty = document.getElementById('emptyState');
   const countEl = document.getElementById('postCount');
+  const pager = document.getElementById('pager');
   const catBtns = [...document.querySelectorAll('[data-cat]')].filter((b) => b.tagName === 'BUTTON');
   const tagBtns = [...document.querySelectorAll('[data-tag]')];
   const cards = [...document.querySelectorAll('#postGrid .post')];
-  let cat = 'all', tag = null;
+  let cat = 'all', tag = null, page = 1;
+
+  function matches(card) {
+    const cardCat = card.getAttribute('data-cat');
+    const cardTags = (card.getAttribute('data-tags') || '').split(',');
+    return (cat === 'all' || cardCat === cat) && (!tag || cardTags.includes(tag));
+  }
+
+  function pageButton(n, label, opts = {}) {
+    const b = document.createElement('button');
+    b.className = 'pgnum px' + (opts.cur ? ' cur' : '');
+    b.textContent = label ?? String(n);
+    b.disabled = !!opts.disabled;
+    if (!opts.disabled) b.addEventListener('click', () => { page = n; apply(); });
+    return b;
+  }
+
+  function renderPager(totalPages) {
+    if (!pager) return;
+    pager.innerHTML = '';
+    if (totalPages <= 1) return;
+
+    pager.appendChild(pageButton(page - 1, '← 上一頁', { disabled: page <= 1 }));
+
+    const nums = new Set([1, totalPages, page, page - 1, page + 1]);
+    let prev = 0;
+    for (const n of [...nums].filter((n) => n >= 1 && n <= totalPages).sort((a, b) => a - b)) {
+      if (prev && n - prev > 1) {
+        const dots = document.createElement('span');
+        dots.className = 'px sub';
+        dots.textContent = '…';
+        pager.appendChild(dots);
+      }
+      pager.appendChild(pageButton(n, String(n), { cur: n === page }));
+      prev = n;
+    }
+
+    pager.appendChild(pageButton(page + 1, '下一頁 →', { disabled: page >= totalPages }));
+  }
 
   function apply() {
-    let shown = 0;
+    const visible = cards.filter(matches);
+    const totalPages = Math.max(1, Math.ceil(visible.length / PAGE_SIZE));
+    if (page > totalPages) page = totalPages;
+    if (page < 1) page = 1;
+
+    const start = (page - 1) * PAGE_SIZE;
+    const end = start + PAGE_SIZE;
+    let shownOnPage = 0;
     cards.forEach((card) => {
-      const cardCat = card.getAttribute('data-cat');
-      const cardTags = (card.getAttribute('data-tags') || '').split(',');
-      const ok = (cat === 'all' || cardCat === cat) && (!tag || cardTags.includes(tag));
-      card.style.display = ok ? '' : 'none';
-      if (ok) shown++;
+      const ok = matches(card);
+      const idx = visible.indexOf(card);
+      const onPage = ok && idx >= start && idx < end;
+      card.style.display = onPage ? '' : 'none';
+      if (onPage) shownOnPage++;
     });
-    if (empty) empty.style.display = shown === 0 ? '' : 'none';
-    if (countEl) countEl.textContent = String(shown);
+
+    if (empty) empty.style.display = visible.length === 0 ? '' : 'none';
+    if (countEl) countEl.textContent = String(visible.length);
     catBtns.forEach((b) => b.classList.toggle('on', b.getAttribute('data-cat') === cat));
     tagBtns.forEach((b) => b.classList.toggle('on', b.getAttribute('data-tag') === tag));
+    renderPager(totalPages);
   }
 
   catBtns.forEach((b) =>
     b.addEventListener('click', () => {
       cat = b.getAttribute('data-cat');
+      page = 1;
       apply();
     })
   );
@@ -91,6 +143,7 @@ const tags = collectTags(posts).slice(0, 8);
     b.addEventListener('click', () => {
       const t = b.getAttribute('data-tag');
       tag = tag === t ? null : t;
+      page = 1;
       apply();
     })
   );

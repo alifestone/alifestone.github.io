@@ -415,10 +415,7 @@ function startCrawler() {
 
 // --- 音樂清單（佔位檔名；把真的音檔丟進 public/music/ 後改這裡即可，見該資料夾 README） ---
 const MUSIC = [
-  { title: '雨天的 debug', src: '/music/rainy-debug.mp3' },
-  { title: '梯度下降到天亮', src: '/music/gradient-lullaby.mp3' },
-  { title: '像素海邊', src: '/music/pixel-beach.mp3' },
-  { title: 'segfault 也沒關係', src: '/music/segfault-ok.mp3' },
+  { title: 'Catch me if you can', src: '/music/Catch_me_if_you_can.mp3' },
 ];
 
 // 軟萌台詞庫

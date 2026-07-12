@@ -1,0 +1,311 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+<meta charset="utf-8">
+<title>debug.log — 維護手冊 / manual</title>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=DotGothic16&family=Noto+Sans+TC:wght@400;500;700&family=JetBrains+Mono:wght@400;700&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#F6F1E7;--surface:#FFFDF8;--ink:#16161E;--sub:#6E6A7C;--line:#16161E;
+  --chip:#EDE6D6;--codebg:#16161E;--codeink:#7EE8C7;--accent:#3EBD93;
+}
+@media (prefers-color-scheme:dark){
+  :root{
+    --bg:#12121B;--surface:#1C1C29;--ink:#EDEAF6;--sub:#9A96AC;--line:#07070C;
+    --chip:#262536;--codebg:#0B0B12;--codeink:#7EE8C7;--accent:#45C6F0;
+  }
+}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);font-family:'Noto Sans TC',sans-serif;line-height:1.75}
+.px{font-family:'DotGothic16','Noto Sans TC',monospace}
+.mono{font-family:'JetBrains Mono',monospace}
+.wrap{max-width:860px;margin:0 auto;padding:0 24px}
+
+header.top{border-bottom:3px solid var(--line);padding:40px 0 28px;background:var(--surface)}
+header.top .wrap{display:flex;flex-direction:column;gap:6px}
+header.top h1{font-size:clamp(26px,4vw,40px);margin:0}
+header.top p{color:var(--sub);margin:0}
+.badge{display:inline-block;background:var(--accent);color:#16161E;border:2px solid var(--line);
+  box-shadow:3px 3px 0 var(--line);padding:2px 10px;font-size:12px;width:fit-content;margin-bottom:6px}
+
+nav.toc{background:var(--chip);border:3px solid var(--line);box-shadow:5px 5px 0 var(--line);
+  padding:18px 22px;margin:32px 0}
+nav.toc h2{font-size:14px;margin:0 0 10px;text-transform:uppercase;letter-spacing:1px}
+nav.toc ol{margin:0;padding-left:20px}
+nav.toc li{margin:4px 0}
+nav.toc a{color:var(--ink);text-decoration:none}
+nav.toc a:hover{color:var(--accent)}
+
+section{margin:48px 0}
+h2.sec{font-size:24px;border-bottom:3px solid var(--line);padding-bottom:8px;margin:0 0 18px;scroll-margin-top:20px}
+h3{font-size:18px;margin:28px 0 10px}
+p{margin:12px 0}
+a{color:var(--accent)}
+code{font-family:'JetBrains Mono',monospace;background:var(--chip);border:1px solid var(--line);
+  padding:1px 5px;font-size:.88em;border-radius:2px}
+pre{background:var(--codebg);color:var(--codeink);border:3px solid var(--line);box-shadow:6px 6px 0 var(--line);
+  padding:16px 18px;overflow:auto;font-family:'JetBrains Mono',monospace;font-size:13px;line-height:1.7}
+pre code{background:none;border:none;padding:0;color:inherit;font-size:inherit}
+ul,ol{padding-left:22px}
+li{margin:6px 0}
+table{border-collapse:collapse;width:100%;margin:16px 0;font-size:14px;display:block;overflow-x:auto}
+th,td{border:2px solid var(--line);padding:8px 12px;text-align:left}
+th{background:var(--chip)}
+.note{background:var(--surface);border-left:5px solid var(--accent);border-top:2px solid var(--line);
+  border-right:2px solid var(--line);border-bottom:2px solid var(--line);padding:12px 16px;margin:18px 0}
+.note.warn{border-left-color:#FF8A8A}
+.step{background:var(--surface);border:3px solid var(--line);box-shadow:4px 4px 0 var(--line);
+  padding:16px 20px;margin:14px 0}
+.step .num{display:inline-block;background:var(--ink);color:var(--bg);border:2px solid var(--line);
+  width:26px;height:26px;text-align:center;line-height:22px;margin-right:8px;font-family:'DotGothic16',monospace}
+.kbd{font-family:'JetBrains Mono',monospace;background:var(--surface);border:2px solid var(--line);
+  box-shadow:2px 2px 0 var(--line);padding:1px 7px;font-size:.85em}
+.file{font-family:'JetBrains Mono',monospace;color:var(--accent);font-weight:700}
+footer{border-top:3px solid var(--line);padding:28px 0;margin-top:60px;color:var(--sub);font-size:13px;text-align:center}
+.chip-demo{display:inline-block;border:2px solid var(--line);padding:2px 8px;font-size:12px;color:#16161E;
+  font-family:'DotGothic16',monospace}
+.c-robo{background:#7EE8C7}.c-ctf{background:#FF8A8A}.c-rl{background:#FFC145}.c-jp{background:#C4B5FD}
+</style>
+</head>
+<body>
+
+<header class="top"><div class="wrap">
+  <span class="badge px">MAINTENANCE MANUAL</span>
+  <h1 class="px">debug.log 維護手冊</h1>
+  <p>普通人類的觀察日記 — 怎麼寫文章、加標籤、增分類，以及日常維護。</p>
+</div></header>
+
+<div class="wrap">
+
+<nav class="toc px">
+  <h2>目錄</h2>
+  <ol>
+    <li><a href="#quickstart">0. 快速開始（本機預覽）</a></li>
+    <li><a href="#write">1. 撰寫 Markdown 文章</a></li>
+    <li><a href="#frontmatter">2. Frontmatter 欄位一覽</a></li>
+    <li><a href="#markdown">3. Markdown 語法速查</a></li>
+    <li><a href="#tags">4. 新增／管理 tag</a></li>
+    <li><a href="#category">5. 新增分類（機器人 / 開發 / claude / certification …）</a></li>
+    <li><a href="#images">6. 放圖片與封面</a></li>
+    <li><a href="#deploy">7. 發佈上線</a></li>
+    <li><a href="#faq">8. 常見問題</a></li>
+  </ol>
+</nav>
+
+<!-- 0 -->
+<section id="quickstart">
+  <h2 class="sec px">0. 快速開始（本機預覽）</h2>
+  <p>所有內容都是靜態檔案，用 Astro 產生。改東西之前先把開發伺服器跑起來，邊改邊看：</p>
+  <pre><code>npm run dev        # 開發模式，通常在 http://localhost:4321
+npm run build      # 產生正式輸出到 dist/
+npm run preview    # 預覽 build 後的結果</code></pre>
+  <div class="note">
+    <strong>習慣：</strong> 每次改完都同時看 <em>淺色</em> 與 <em>深色</em> 兩種主題（右上角切換鈕），確認顏色與 Slimo 都正常。專案沒有 lint / test，肉眼驗證就是驗證。
+  </div>
+</section>
+
+<!-- 1 -->
+<section id="write">
+  <h2 class="sec px">1. 撰寫 Markdown 文章</h2>
+  <p>一篇文章 = <span class="file">src/content/posts/</span> 底下一個 <code>.md</code> 檔。新增文章最簡單的做法：</p>
+
+  <div class="step"><span class="num px">1</span>複製範本檔 <span class="file">src/content/posts/hello-world.md</span>，改成新檔名，例如 <code>my-first-ctf.md</code>。檔名會變成網址：<code>/posts/my-first-ctf/</code>。</div>
+  <div class="step"><span class="num px">2</span>改上方 <code>---</code> 之間的 frontmatter（標題、日期、分類、標籤、摘要）。欄位說明見下一節。</div>
+  <div class="step"><span class="num px">3</span>在 frontmatter 底下用 Markdown 寫正文。</div>
+  <div class="step"><span class="num px">4</span>存檔 → 開發伺服器會自動重整。文章會自動出現在首頁與 <code>/posts/</code> 列表，並依日期排序。</div>
+
+  <div class="note">
+    <strong>檔名建議：</strong> 用小寫英文與連字號（<code>ppo-from-scratch.md</code>），避免空白與中文，網址才乾淨。日期不用寫進檔名，排序看 frontmatter 的 <code>date</code>。
+  </div>
+</section>
+
+<!-- 2 -->
+<section id="frontmatter">
+  <h2 class="sec px">2. Frontmatter 欄位一覽</h2>
+  <p>每篇文章最上方用兩行 <code>---</code> 包起來的 YAML。這是唯一「規定格式」的地方——欄位定義在 <span class="file">src/content/config.ts</span>，填錯 build 會報錯（這是好事，會擋下漏填）。</p>
+
+  <pre><code>---
+title: PPO 從零開始：一步步推導 clip objective
+date: 2026-06-19
+category: 強化學習
+tags: [PPO, PyTorch, RL]
+excerpt: 不依賴任何 RL 函式庫，從 policy gradient 推到 PPO-Clip，200 行驗證。
+readMin: 8
+draft: false
+---</code></pre>
+
+  <table>
+    <thead><tr><th>欄位</th><th>必填</th><th>說明</th></tr></thead>
+    <tbody>
+      <tr><td><code>title</code></td><td>是</td><td>文章標題（字串）。</td></tr>
+      <tr><td><code>date</code></td><td>是</td><td>日期 <code>YYYY-MM-DD</code>。決定排序（新→舊）與顯示日期。</td></tr>
+      <tr><td><code>category</code></td><td>是</td><td>分類，<strong>只能是預先定義好的那幾個</strong>之一。要加新分類看 <a href="#category">第 5 節</a>。</td></tr>
+      <tr><td><code>tags</code></td><td>否</td><td>標籤陣列，如 <code>[PPO, PyTorch]</code>。沒填就是空陣列。詳見 <a href="#tags">第 4 節</a>。</td></tr>
+      <tr><td><code>excerpt</code></td><td>是</td><td>摘要，顯示在文章卡片上。一兩句話。</td></tr>
+      <tr><td><code>cover</code></td><td>否</td><td>封面圖，相對路徑如 <code>./cover.png</code>。</td></tr>
+      <tr><td><code>coverAlt</code></td><td>否</td><td>封面圖替代文字（無障礙用）。</td></tr>
+      <tr><td><code>readMin</code></td><td>否</td><td>閱讀分鐘數（數字），自己估。</td></tr>
+      <tr><td><code>draft</code></td><td>否</td><td><code>true</code> = 草稿，不會出現在網站上；預設 <code>false</code>。</td></tr>
+    </tbody>
+  </table>
+
+  <div class="note warn">
+    <strong>注意：</strong> <code>date</code> 不要加引號寫成字串，直接寫 <code>2026-06-19</code>；<code>category</code> 的值要跟定義完全一樣（含空白，如 <code>資安 CTF</code> 中間有一個半形空白）。
+  </div>
+</section>
+
+<!-- 3 -->
+<section id="markdown">
+  <h2 class="sec px">3. Markdown 語法速查</h2>
+  <p>正文支援標準 Markdown。以下是這個部落格會用到、且套好樣式的元素（完整範例見 <span class="file">hello-world.md</span>）。</p>
+
+  <h3>標題、粗斜體、連結</h3>
+  <pre><code>## 這是 h2（會進目錄 TOC）
+### 這是 h3（也會進目錄）
+
+行內可以用 **粗體**、*斜體*、`inline code`，或放一個[連結](/about/)。</code></pre>
+  <div class="note">文章頁的目錄（TOC）會自動抓 <code>##</code> 和 <code>###</code>。用 <code>#</code>（h1）沒必要——標題已由 <code>title</code> 產生。</div>
+
+  <h3>清單與引言</h3>
+  <pre><code>- 無序清單項目
+- 第二項
+
+1. 有序清單
+2. 第二步
+
+&gt; 這是引言區塊（blockquote）。</code></pre>
+
+  <h3>程式碼區塊</h3>
+  <p>三個反引號加語言名稱，會套用像素風深色外框：</p>
+  <pre><code>```python
+def clip_objective(ratio, adv, eps=0.2):
+    return -torch.min(ratio*adv, ratio.clamp(1-eps,1+eps)*adv).mean()
+```</code></pre>
+
+  <h3>表格</h3>
+  <pre><code>| 設定 | 成功率 |
+|---|---|
+| base | 12% |
+| 微調 @ 20k | **74%** |</code></pre>
+</section>
+
+<!-- 4 -->
+<section id="tags">
+  <h2 class="sec px">4. 新增／管理 tag</h2>
+  <p>標籤是<strong>免登記</strong>的——不需要在任何清單裡預先定義。你只要在文章 frontmatter 的 <code>tags</code> 陣列寫下它，網站就會自動收集、去重、統計數量，並顯示在側欄與文章列表的篩選器。</p>
+
+  <pre><code>tags: [LeRobot, SmolVLA, fine-tuning]</code></pre>
+
+  <ul>
+    <li><strong>新增 tag：</strong> 直接在某篇文章的 <code>tags</code> 加一個新字串即可。</li>
+    <li><strong>刪除 tag：</strong> 把它從所有文章的 <code>tags</code> 移掉，它就會自動消失（沒有文章用到的 tag 不會出現）。</li>
+    <li><strong>重新命名：</strong> 這是純字串比對，所以 <code>PyTorch</code> 和 <code>pytorch</code> 會被當成兩個不同 tag。想改名就到用到它的每篇文章一起改，保持大小寫一致。</li>
+  </ul>
+
+  <div class="note">
+    背後邏輯在 <span class="file">src/lib/posts.ts</span> 的 <code>collectTags()</code>：它掃過所有文章、依出現次數排序。你不用碰這支檔案，寫文章時管好 <code>tags</code> 陣列就好。
+  </div>
+</section>
+
+<!-- 5 -->
+<section id="category">
+  <h2 class="sec px">5. 新增分類</h2>
+  <p>分類跟 tag 不同——它是<strong>受控清單</strong>，要新增（例如 <em>開發</em>、<em>claude</em>、<em>certification</em>）需要動幾支檔案。目前已有的分類：</p>
+  <p>
+    <span class="chip-demo c-robo">機器人</span>
+    <span class="chip-demo c-ctf">資安 CTF</span>
+    <span class="chip-demo c-rl">強化學習</span>
+    <span class="chip-demo c-jp">日本語</span>
+  </p>
+  <p>下面以新增一個 <code>開發</code> 分類（chip class 取名 <code>c-dev</code>、顏色用天藍 <code>#7EC8FF</code>）為例，走一遍五個步驟：</p>
+
+  <div class="step"><span class="num px">1</span>
+    <strong>登記到 schema</strong> — <span class="file">src/content/config.ts</span>，把新名稱加進 <code>category</code> enum：
+    <pre><code>category: z.enum(['機器人', '資安 CTF', '強化學習', '日本語', '開發']),</code></pre>
+    沒這一步，文章寫 <code>category: 開發</code> 會 build 失敗。
+  </div>
+
+  <div class="step"><span class="num px">2</span>
+    <strong>對應 chip class</strong> — <span class="file">src/lib/posts.ts</span>，在 <code>CAT_CLASS</code> 加一行，並把它加進 <code>collectCategories()</code> 的 <code>order</code> 陣列（決定側欄顯示順序）：
+    <pre><code>export const CAT_CLASS = {
+  '機器人': 'c-robo',
+  '資安 CTF': 'c-ctf',
+  '強化學習': 'c-rl',
+  '日本語': 'c-jp',
+  '開發': 'c-dev',        // ← 新增
+};
+// ...
+const order = ['機器人', '資安 CTF', '強化學習', '日本語', '開發']; // ← 也加進來</code></pre>
+  </div>
+
+  <div class="step"><span class="num px">3</span>
+    <strong>加顏色</strong> — <span class="file">src/styles/global.css</span>，找到這行加上新的 class：
+    <pre><code>.c-robo{background:#7EE8C7}.c-ctf{background:#FF8A8A}.c-rl{background:#FFC145}.c-jp{background:#C4B5FD}.c-dev{background:#7EC8FF}</code></pre>
+  </div>
+
+  <div class="step"><span class="num px">4</span>
+    <strong>加進文章列表的篩選器</strong> — <span class="file">src/pages/posts/index.astro</span>，在分類陣列加一項：
+    <pre><code>{ key: '開發', name: '開發', cls: 'c-dev' },</code></pre>
+  </div>
+
+  <div class="step"><span class="num px">5</span>
+    <strong>（選配）關於頁介紹</strong> — 若想在 <span class="file">src/pages/about.astro</span> 的「我在做什麼」區塊也介紹這個分類，比照現有格式加一項 <code>{ cat, cls, title, desc }</code>。純介紹用，不影響文章功能。
+  </div>
+
+  <div class="note warn">
+    <strong>小抄：</strong> 加分類 = 動 <span class="file">config.ts</span>（登記）+ <span class="file">posts.ts</span>（class 對應與順序）+ <span class="file">global.css</span>（顏色）+ <span class="file">posts/index.astro</span>（篩選）。前三支是必要的；漏了 config.ts 會 build 失敗，漏了 css 顏色 chip 會變透明。
+  </div>
+  <p>之後只要在文章寫 <code>category: 開發</code> 就能用了。想加 <code>claude</code>、<code>certification</code> 等其他分類，同樣照這五步，換掉名稱、class 名與顏色即可。</p>
+</section>
+
+<!-- 6 -->
+<section id="images">
+  <h2 class="sec px">6. 放圖片與封面</h2>
+  <h3>正文圖片</h3>
+  <p>把圖片放在文章 <code>.md</code> 旁邊（同資料夾）或 <span class="file">src/assets/</span>，用相對路徑引用，Astro build 時會自動最佳化：</p>
+  <pre><code>![機械手臂抓透明杯](./grasp.png)</code></pre>
+  <h3>封面圖</h3>
+  <p>在 frontmatter 指定 <code>cover</code>（會顯示在卡片／文章頂端），建議一起給 <code>coverAlt</code>：</p>
+  <pre><code>cover: ./cover.png
+coverAlt: 機械手臂抓取透明物件的示意圖</code></pre>
+  <div class="note">放在 <span class="file">public/</span> 的圖片則用絕對路徑 <code>/xxx.png</code> 引用、不會被最佳化，適合 favicon 這類固定資源。</div>
+</section>
+
+<!-- 7 -->
+<section id="deploy">
+  <h2 class="sec px">7. 發佈上線</h2>
+  <p>站點是 GitHub Pages user site（<code>alifestone.github.io</code>）。發佈流程：把改動 commit 後 push 到 <code>main</code>，GitHub Actions 會自動 build 並部署。</p>
+  <pre><code>git add .
+git commit -m "add: 新文章 xxx"
+git push</code></pre>
+  <div class="note">
+    Pages 的來源要設成 <strong>GitHub Actions</strong>（Settings → Pages → Source）。部署 workflow 在 <span class="file">.github/</span> 底下。push 後到 repo 的 Actions 分頁看綠燈就代表上線了。
+  </div>
+</section>
+
+<!-- 8 -->
+<section id="faq">
+  <h2 class="sec px">8. 常見問題</h2>
+  <h3>文章寫好了卻沒出現？</h3>
+  <ul>
+    <li>檢查 <code>draft:</code> 是不是還是 <code>true</code>。</li>
+    <li>檔案要放在 <span class="file">src/content/posts/</span> 且副檔名是 <code>.md</code>。</li>
+    <li>frontmatter 有沒有兩行 <code>---</code> 包好、必填欄位有沒有漏。</li>
+  </ul>
+  <h3>build 報錯 <code>Invalid enum value</code>？</h3>
+  <p><code>category</code> 填了沒登記的分類。回 <a href="#category">第 5 節</a> 先把它加進 <span class="file">config.ts</span> 的 enum，或改成現有分類。</p>
+  <h3>chip（分類標籤）變透明／沒顏色？</h3>
+  <p>忘了在 <span class="file">global.css</span> 加對應的 <code>.c-xxx{background:…}</code>。</p>
+  <h3>想改 Slimo（吉祥物）或整體設計？</h3>
+  <p>那屬於設計層，見 <span class="file">CLAUDE.md</span> 的架構說明（Slimo 的 sprite 在 <span class="file">src/scripts/site.js</span>，設計系統在 <span class="file">global.css</span>）。日常寫文章不需要碰。</p>
+</section>
+
+<footer class="px">
+  debug.log 維護手冊 · 有疑問先讀 <span class="file">CLAUDE.md</span> 與 <span class="file">hello-world.md</span> · 手刻像素，一格一格。
+</footer>
+
+</div>
+</body>
+</html>

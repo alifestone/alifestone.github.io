@@ -93,11 +93,23 @@ body{margin:0}
 .footer{border-top:3px solid var(--line);padding:22px 28px;font-size:13px}
 
 /* --- 裝飾：爬行 Slimo / wipe 轉場 / scanlines --- */
-.crawler{position:fixed;left:0;top:0;z-index:60;pointer-events:none;will-change:transform}
+/* 可互動：可拖曳 + 可點擊對話，故開啟 pointer-events；hover 顯示可抓提示 */
+.crawler{position:fixed;left:0;top:0;z-index:60;pointer-events:auto;cursor:grab;will-change:transform;touch-action:none}
+.crawler.dragging{cursor:grabbing}
+.crawler canvas{pointer-events:none}
 .wipe{position:fixed;inset:0;z-index:99;display:grid;grid-template-columns:repeat(12,1fr);grid-template-rows:repeat(7,1fr);pointer-events:none}
 .wcell{background:var(--line);opacity:0;transition:opacity .14s steps(2,end)}
 .wipe.in .wcell{opacity:1}
 .scan{position:fixed;inset:0;z-index:55;pointer-events:none;background:repeating-linear-gradient(0deg,rgba(0,0,0,.06) 0 1px,transparent 1px 3px)}
+
+/* --- 首頁底部草皮（永遠可見，貼視窗底） --- */
+.grassband{position:fixed;left:0;right:0;bottom:0;z-index:40;pointer-events:none;overflow:hidden;line-height:0}
+.grassrow{display:flex;flex-wrap:nowrap;width:100%}
+.grasscell{width:var(--tileW);height:var(--tileH);flex:0 0 var(--tileW)}
+/* 讓內容不被草皮壓到：首頁 footer 下方預留草皮高度（含餘裕）
+   --grassH = 草皮 tile 高(56) + 餘裕(16)；改草高時同步調整 Grass.astro 的 size */
+.has-grass{--grassH:72px}
+.has-grass .footer{margin-bottom:var(--grassH)}
 
 /* ============================================================
    文章頁（單篇）
@@ -217,4 +229,61 @@ body{margin:0}
   .dogrid{grid-template-columns:1fr}
   .center{padding:40px 20px}
   .trail{display:none}
+  .slimo-dialog{width:min(92vw,340px)}
 }
+
+/* ============================================================
+   Slimo 對話系統（點擊 Slimo → 像素對話泡泡 + 音樂 + 小遊戲）
+   ============================================================ */
+/* 對話泡泡：跟著 Slimo 定位，neo-brutalist 硬陰影 + 尖角小三角 */
+.slimo-dialog{position:fixed;z-index:80;width:300px;background:var(--surface);color:var(--ink);
+  border:3px solid var(--line);box-shadow:6px 6px 0 var(--line);
+  font-family:'Noto Sans TC',sans-serif;padding:14px 14px 12px;
+  opacity:0;transform:translateY(6px) scale(.98);pointer-events:none;
+  transition:opacity .14s steps(2,end),transform .14s steps(2,end)}
+.slimo-dialog.open{opacity:1;transform:none;pointer-events:auto}
+/* 泡泡朝向 Slimo 的小尖角（下方預設，.up 時翻到上方） */
+.slimo-dialog::after{content:'';position:absolute;left:var(--tailX,24px);bottom:-11px;
+  width:0;height:0;border:8px solid transparent;border-top-color:var(--line)}
+.slimo-dialog.up::after{bottom:auto;top:-11px;border-top-color:transparent;border-bottom-color:var(--line)}
+.slimo-dialog .dtop{display:flex;align-items:center;justify-content:space-between;gap:8px;margin-bottom:8px}
+.slimo-dialog .dname{font-family:'DotGothic16',monospace;font-size:13px;font-weight:700}
+.slimo-dialog .dclose{background:none;border:0;font-family:'DotGothic16',monospace;font-size:14px;
+  color:var(--sub);cursor:pointer;line-height:1;padding:2px 4px}
+.slimo-dialog .dclose:hover{color:var(--accent)}
+/* Slimo 說的話 */
+.slimo-say{font-size:13.5px;line-height:1.7;min-height:38px;margin:0 0 10px}
+.slimo-say .caret{display:inline-block;width:7px;height:14px;background:var(--accent);
+  vertical-align:-2px;margin-left:2px;animation:blink 1s steps(2,end) infinite}
+@keyframes blink{50%{opacity:0}}
+/* 選項 / 動作按鈕（像素、逐列） */
+.slimo-acts{display:flex;flex-direction:column;gap:6px}
+.slimo-act{display:flex;align-items:center;gap:8px;width:100%;text-align:left;
+  background:var(--chip);color:var(--ink);border:2px solid var(--line);
+  font-family:'DotGothic16',monospace;font-size:13px;padding:7px 9px;cursor:pointer;
+  transition:transform .1s steps(2,end),background .1s}
+.slimo-act:hover{background:var(--accent);color:#16161E;transform:translateX(2px)}
+.slimo-act .k{font-family:'JetBrains Mono',monospace;font-size:11px;opacity:.7}
+.slimo-back{margin-top:8px;font-family:'DotGothic16',monospace;font-size:12px;color:var(--sub);
+  background:none;border:0;cursor:pointer;padding:2px 0}
+.slimo-back:hover{color:var(--accent)}
+/* 迷你音樂播放器 */
+.slimo-player .pcur{font-family:'JetBrains Mono',monospace;font-size:12px;
+  background:var(--codebg);color:var(--codeink);border:2px solid var(--line);
+  padding:6px 8px;margin-bottom:8px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.slimo-player .pctrls{display:flex;gap:6px;margin-bottom:8px}
+.slimo-player .pctrls button{flex:1;font-family:'DotGothic16',monospace;font-size:14px;
+  background:var(--chip);color:var(--ink);border:2px solid var(--line);padding:6px 0;cursor:pointer}
+.slimo-player .pctrls button:hover{background:var(--accent);color:#16161E}
+.slimo-player .plist{display:flex;flex-direction:column;gap:4px;max-height:132px;overflow:auto}
+.slimo-track{display:flex;align-items:center;gap:8px;font-size:12.5px;padding:5px 7px;
+  border:2px solid transparent;cursor:pointer}
+.slimo-track:hover{border-color:var(--line);background:var(--chip)}
+.slimo-track.on{border-color:var(--accent);background:var(--chip);font-weight:700}
+.slimo-track .tnum{font-family:'JetBrains Mono',monospace;font-size:11px;color:var(--sub)}
+/* 小遊戲畫布區 */
+.slimo-game{display:flex;flex-direction:column;gap:8px}
+.slimo-game .gstat{display:flex;justify-content:space-between;font-family:'JetBrains Mono',monospace;font-size:12px}
+.slimo-gcanvas{width:100%;image-rendering:pixelated;border:2px solid var(--line);
+  background:var(--codebg);display:block;cursor:crosshair;touch-action:none}
+.slimo-hint{font-size:11.5px;color:var(--sub);line-height:1.5}

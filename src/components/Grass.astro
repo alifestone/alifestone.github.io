@@ -1,0 +1,24 @@
+---
+// 首頁底部草皮：固定貼在視窗底部、永遠可見。
+// 由多個 24×10 的草皮 canvas 水平平鋪組成，實際繪製與主題配色由 site.js 依 data-slime="grass" 負責。
+// props：
+//   size — 每個草皮 tile 的 CSS 顯示高度(px)，寬度依 24:10 原生比例換算。
+interface Props { size?: number; }
+const { size = 56 } = Astro.props;
+const tileH = size;
+const tileW = Math.round((size * 24) / 10);
+// 用足量的 tile 以確保寬螢幕也能鋪滿（CSS 再以 flex 收尾），繪製便宜、DOM 輕量。
+const tiles = Array.from({ length: 40 });
+---
+<div class="grassband" id="grassband" aria-hidden="true">
+  <div class="grassrow" style={`--tileW:${tileW}px;--tileH:${tileH}px`}>
+    {tiles.map(() => (
+      <canvas
+        width="24"
+        height="10"
+        data-slime="grass"
+        class="pxc grasscell"
+      ></canvas>
+    ))}
+  </div>
+</div>

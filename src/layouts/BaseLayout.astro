@@ -3,6 +3,7 @@ import '../styles/global.css';
 import Nav from '../components/Nav.astro';
 import Footer from '../components/Footer.astro';
 import Decorations from '../components/Decorations.astro';
+import Grass from '../components/Grass.astro';
 
 interface Props {
   title?: string;
@@ -12,6 +13,7 @@ interface Props {
   crawler?: boolean;
   scanlines?: boolean;
   nav?: boolean;         // 是否顯示導覽列（預設 true）
+  grass?: boolean;       // 是否顯示底部草皮（首頁用）
 }
 const {
   title = 'debug.log — 普通人類的觀察日記',
@@ -21,6 +23,7 @@ const {
   crawler = true,
   scanlines = false,
   nav = true,
+  grass = false,
 } = Astro.props;
 ---
 <!doctype html>
@@ -47,11 +50,12 @@ const {
   </script>
 </head>
 <body>
-  <div class={`site ${siteClass}`} id="site" data-screen-label={title}>
+  <div class={`site ${siteClass} ${grass ? 'has-grass' : ''}`} id="site" data-screen-label={title}>
     {nav && <Nav current={current} />}
     <slot />
     <Footer />
     <Decorations crawler={crawler} scanlines={scanlines} />
+    {grass && <Grass />}
   </div>
   <script>
     import { initSite } from '../scripts/site.js';

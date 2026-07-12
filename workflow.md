@@ -55,8 +55,40 @@
    （唯一提示為 Node 20 deprecation 的無害通知。）
 4. 之後更新流程：git push 到 main 即自動 build + 部署；新增文章 = 在 src/content/posts/ 加 .md 後 push。
 
+階段7：（首頁互動與吉祥物強化 — 完成）
+1. 首頁底部草皮（永遠可見）：
+   - 新增 grass 精靈（24×10 可水平平鋪）與獨立綠色調色盤 GRASS_LIGHT/GRASS_DARK（隨主題變色），
+     加進 site.js 的 SPRITES 與 palFor()。
+   - 新元件 src/components/Grass.astro：多個 tile flex 平鋪、position:fixed 貼視窗底。
+     BaseLayout 加 grass prop（僅 index.astro 開啟），.has-grass 給 footer 預留 --grassH 底距，
+     避免蓋住頁尾兩行字（草高定為 tile 56px + 餘裕 16px = 72px）。
+   - 另附一段可貼進 Claude Design 的草皮 prompt（三階綠、可無縫平鋪、含深色版）。
+2. 爬行 Slimo 可拖曳：
+   - 重寫 site.js 的 startCrawler 為狀態機 crawl / drag / return，並開啟 .crawler 的 pointer-events。
+   - 拖曳用 pointer events（桌機/觸控通用），移動未超過 5px 視為點擊（觸發對話）。
+   - 放手後以 easeOutCubic 補間回「最近的邊框」再接回巡行（perimeterPos / nearestD 幾何，已用 Node 驗證）。
+3. 點擊 Slimo 對話系統（軟萌療癒人設）：
+   - 像素對話泡泡（neo-brutalist + 打字機效果，尖角指向 Slimo 並跟隨定位）。
+   - 三分支：來點音樂（迷你播放清單）/ 陪我玩 / 隨便聊聊。
+   - 音樂：public/music/ 佔位檔名 + 該資料夾 README 教學；改 site.js 的 MUSIC 陣列即可換真檔，
+     檔案不存在時靜默失敗不壞頁。
+   - 小遊戲：餵食/戳戳樂（canvas 內 Slimo 變形、無勝負療癒）＋ 像素接接看（30 秒接星星閃臭蟲計分）。
+   - 對話開啟時 Slimo 暫停巡行（paused）停在原地方便點按鈕，關閉後從原位接回爬行。
+4. 拖曳懸空動畫（Claude Design handoff → 落地 + 依需求調整）：
+   - 從 Claude Design 專案「技術部落格首頁設計」取得 slimeDrag/drop 精靈 handoff（zip：README + 預覽圖）。
+   - 加進 SPRITES：slimeDrag（拖曳懸空的水滴身形、下垂閉眼無奈臉、白色高光）＋ drop（小水滴）。
+   - 拖曳時換成 slimeDrag、頂部中心錨點、不踏步不彈跳（只做極輕微鐘擺 sway/bob），
+     底部尖端每 1.4–2.4s 生成獨立 drop 重力下墜、落地移除；放手清滴水並切回爬行精靈。
+   - 依使用者需求把水滴倒過來成「圓頭在上、尖底在下」的倒水滴（slimeDrag 改為 16×20），
+     setSprite 改用 DIMS 表按精靈各自寬高設定 canvas。
+5. 驗證：node --check + npm run build（6 頁）皆通過；精靈陣列尺寸/字元、拖曳回歸幾何、滴水生命週期
+   以 Node 驗過。**尚未做**瀏覽器內實測（本機無 Playwright/Puppeteer）——建議 npm run dev 親自確認
+   草皮不蓋頁尾、對話/遊戲/音樂、拖曳造型與滴水方向、light/dark 各一次。
+
 尚待進行（可選）：
 - 階段6（CI/CD 進階）：核心「push 自動部署」已由階段5 workflow 達成；
   若要加強可在 build 前跑 astro check 型別檢查。
 - 把首頁舊的 inline demo 文章逐步改寫成正式 Markdown 文章。
 - projects.astro 目前為佔位頁，之後補內容。
+- 把 public/music/ 的佔位曲目換成真音檔並更新 site.js 的 MUSIC 清單。
+- 階段7 各互動的瀏覽器內實測（拖曳手感、滴水節奏、對話/遊戲）。

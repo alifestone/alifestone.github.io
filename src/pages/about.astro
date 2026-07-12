@@ -3,17 +3,18 @@ import BaseLayout from '../layouts/BaseLayout.astro';
 import Slimo from '../components/Slimo.astro';
 
 const doings = [
-  { cat: '機器人', cls: 'c-robo', title: '機器人研究', desc: '在 IDLab 做模仿學習與視覺抓取，主力是 LeRobot 生態系與 SmolVLA 微調，讓機械手臂學會處理透明物件這類麻煩案例。' },
-  { cat: '資安 CTF', cls: 'c-ctf', title: '資安 CTF', desc: '主攻 pwn 與 reverse，常駐 picoCTF 與校內賽。喜歡把 exploit 寫成能重播的腳本，而不是一次性的魔法。' },
-  { cat: '強化學習', cls: 'c-rl', title: '強化學習', desc: '從零手刻演算法派：不先讀懂 PPO 的每一行推導，就不准自己 import stable-baselines。' },
-  { cat: '日本語', cls: 'c-jp', title: '日文學習', desc: '目標 JLPT N2。動機一半是讀日文論文與技術書，另一半是不想再等遊戲中文化。' },
+  { cat: '資安 CTF', cls: 'c-ctf', title: '資安 / CTF', desc: '主戰場。跟隊伍「企鵝好可愛所以我們叫 Tomorin」打進 AIS3 EOF 拿第 11 名，也跟「LognEqualsOne」在 CDX 資安攻防交流賽拿到決賽佳作。第九屆好厲駭結業，喜歡把 exploit 寫成能重播的腳本，而不是一次性的魔法。' },
+  { cat: '機器學習', cls: 'c-rl', title: '機器學習 / RL', desc: '獨立研究派。用 Multi-Armed Bandit 與決策樹模擬人類的風險決策策略；也做過巴黎奧運社群情緒對 Airbnb 房價影響的分析。信奉先讀懂推導再 import。' },
+  { cat: '開源研究', cls: 'c-robo', title: '開源與工具', desc: '寫 ECB 靜態檢測工具：用 Python 爬蟲 + AST 掃描 pycryptodome 生態系裡 AES-ECB 模式的誤用。點子到實作都自己來。' },
+  { cat: '教學', cls: 'c-jp', title: '教學與社群', desc: 'GDGoC NTNU 社長、艾思程式兒童 Python 講師、資工營與國中程式營講師。從 Scratch、HTML 到 C++、Discord Bot 串 AI，喜歡把難的東西講到聽得懂。' },
 ];
-const skills = ['PyTorch', 'ROS2', 'LeRobot', 'SmolVLA', 'pwntools', 'Ghidra', 'gdb + pwndbg', 'Python', 'C / C++', 'Docker', 'gymnasium', 'Anki'];
+const skills = ['Python', 'C', 'Django', 'Flask', 'NumPy', 'Pandas', 'Sklearn', 'Burp Suite', 'Git', 'GitHub', 'Linux', 'Vim', 'VS Code', 'MCP', 'Claude Code'];
+const certs = ['ITS 資通安全核心能力', 'Cisco CCST Cybersecurity', 'Postman API Fundamentals Student Expert', 'Google Foundations of Cybersecurity', 'TOEIC 770', 'GEPT 中級'];
 const timeline = [
-  { year: '2026', txt: 'SmolVLA 透明物件抓取實驗，成功率 12% → 74%；部落格 debug.log 開站。' },
-  { year: '2025', txt: '加入 IDLab 攻讀碩士，研究方向定為模仿學習；開始用 LeRobot 收集實機資料。' },
-  { year: '2024', txt: '第一次打進 CTF 決賽（校際賽 pwn 組），從此掉進二進位的坑。' },
-  { year: '2023', txt: '大學專題用 DQN 玩 Atari，發現調 reward 比寫程式難十倍。' },
+  { year: '2025', txt: '接任 GDGoC NTNU 社長；CDX 資安攻防交流賽拿決賽佳作；完成 ECB 靜態檢測工具與 Multi-Armed Bandit 獨立研究。' },
+  { year: '2024', txt: '進入師大資工系；AIS3 EOF 進階攻防拿第 11 名；入選第九屆好厲駭，開始在艾思當兒童 Python 講師。' },
+  { year: '2023', txt: '在陽明交大 ewant 自主修完 Python 數據分析，拿到修課證書；跟同學一起把高中輔導室的活動簽到自動化。' },
+  { year: '2022', txt: '高中資訊社教學長 / 資訊志工隊：到偏鄉國中教 Scratch、HTML、App Inventor，也教學弟妹 C++。' },
 ];
 ---
 <BaseLayout current="about" title="關於我 — debug.log">
@@ -22,10 +23,10 @@ const timeline = [
       <div class="avbox"><Slimo sprite="slime" size={96} label="Slimo 頭像" /></div>
       <div>
         <p class="px sub fs13 m0">// whoami</p>
-        <h1 class="px name">阿哲 / bit.o</h1>
-        <p class="px role m0"><span class="chip c-robo px">機器人研究生 @ IDLab</span></p>
-        <p class="bio sub">白天在實驗室讓機械手臂學抓東西，晚上打 CTF 解 pwn 題。這個部落格記錄我在模仿學習、強化學習與資安路上踩過的坑——寫下來的目的很單純：下次踩到同一個坑時，至少 Google 得到自己。偶爾也會出現日文學習筆記，因為論文跟遊戲都逃不掉日文。</p>
-        <div class="fx ac gap12 mt16 px"><a href="#" class="soc">GitHub</a><a href="#" class="soc">RSS</a><a href="#" class="soc">Email</a></div>
+        <h1 class="px name">lifestone</h1>
+        <p class="px role m0"><span class="chip c-ctf px">師大資工 · 資安 / CTF</span> <span class="chip c-jp px">GDGoC NTNU 社長</span></p>
+        <p class="bio sub">周聖詠，師大資訊工程系大學生（2024–2028）。白天打 CTF、寫檢測工具、在課堂上教小朋友寫 Python，晚上把踩過的坑寫成筆記。這個部落格記錄我在資安、機器學習與日文路上跌倒的過程——寫下來的目的很單純：下次踩到同一個坑時，至少 Google 得到自己。座右銘是「只要不是錯的事，就大膽試試看吧」。</p>
+        <div class="fx ac gap12 mt16 px"><a href="https://github.com/alifestone" class="soc" target="_blank" rel="noopener">GitHub</a><a href="https://www.linkedin.com/in/1ifestone/" class="soc" target="_blank" rel="noopener">LinkedIn</a><a href="mailto:mses101137@gmail.com" class="soc">Email</a></div>
       </div>
     </header>
 
@@ -46,6 +47,13 @@ const timeline = [
       <h2 class="px sechead">技能 / 工具</h2>
       <div class="fx wrap gap10">
         {skills.map((s) => <span class="tagchip mono">{s}</span>)}
+      </div>
+    </section>
+
+    <section class="section">
+      <h2 class="px sechead">證照 / 認證</h2>
+      <div class="fx wrap gap10">
+        {certs.map((c) => <span class="tagchip mono">{c}</span>)}
       </div>
     </section>
 

@@ -1,0 +1,17 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+import Slimo from '../components/Slimo.astro';
+---
+<BaseLayout current="projects" title="專案 — debug.log">
+  <main class="container">
+    <header class="hero">
+      <p class="px sub fs13 m0">// projects --wip</p>
+      <h1 class="px herotitle m0">專案 / 作品集</h1>
+      <p class="sub fs15 m0" style="max-width:560px;line-height:1.8">這頁還在整理中——之後會放機器人研究 demo、CTF 工具與 side project。Slimo 先幫忙佔位。</p>
+    </header>
+    <div class="tc" style="padding:32px 0 80px">
+      <Slimo sprite="slime" size={120} label="Slimo 佔位" />
+      <p class="px sub mt16">coming soon…</p>
+    </div>
+  </main>
+</BaseLayout>

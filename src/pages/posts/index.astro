@@ -1,0 +1,98 @@
+---
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import { getSortedPosts, collectTags, catClass, fmtDate } from '../../lib/posts';
+
+const posts = await getSortedPosts();
+const total = posts.length;
+const cats = [
+  { key: 'all', name: '全部', cls: 'f-all' },
+  { key: '機器人', name: '機器人', cls: 'c-robo' },
+  { key: '資安 CTF', name: '資安CTF', cls: 'c-ctf' },
+  { key: '強化學習', name: '強化學習', cls: 'c-rl' },
+  { key: '日本語', name: '日本語', cls: 'c-jp' },
+];
+const tags = collectTags(posts).slice(0, 8);
+---
+<BaseLayout current="posts" title="全部文章 — debug.log">
+  <header class="listhero"><div class="container herogrid">
+    <div>
+      <p class="px sub fs13 m0">// archive --all</p>
+      <h1 class="px herotitle m0">全部文章</h1>
+      <p class="sub fs14 m0" style="line-height:1.8">共 <span id="postCount">{total}</span> 篇 — 機器人、資安、強化學習與日文筆記的完整存檔。</p>
+    </div>
+    <div class="filters">
+      <div class="fx ac gap10 wrap" style="justify-content:flex-end">
+        {cats.map((c) => (
+          <button class={`fchip px ${c.cls}${c.key === 'all' ? ' on' : ''}`} data-cat={c.key}>{c.name}</button>
+        ))}
+      </div>
+      <div class="fx ac gap8 wrap" style="justify-content:flex-end">
+        <span class="px sub fs12 nowrap">tag:</span>
+        {tags.map((t) => <button class="tagchip mono" data-tag={t}>#{t}</button>)}
+      </div>
+    </div>
+  </div></header>
+
+  <main class="container">
+    <div class="postgrid" id="postGrid">
+      {posts.map((p) => (
+        <article class="card post lift" data-cat={p.data.category} data-tags={p.data.tags.join(',')}>
+          <div class="fx ac jb">
+            <span class={`chip px ${catClass(p.data.category)}`}>{p.data.category}</span>
+            <span class="date px">{fmtDate(p.data.date)}</span>
+          </div>
+          <h3 class="px ptitle"><a href={`/posts/${p.slug}/`}>{p.data.title}</a></h3>
+          <p class="excerpt sub m0 mt8">{p.data.excerpt}</p>
+          <div class="fx ac gap10 wrap mt12">
+            {p.data.tags.map((t) => <span class="tag mono">#{t}</span>)}
+          </div>
+        </article>
+      ))}
+    </div>
+
+    <div class="card empty" id="emptyState" style="display:none">
+      <p class="px fs16 m0">404: no posts found</p>
+      <p class="sub fs13 m0 mt8">這個篩選組合下沒有文章，換個條件試試。</p>
+    </div>
+  </main>
+</BaseLayout>
+
+<script>
+  const grid = document.getElementById('postGrid');
+  const empty = document.getElementById('emptyState');
+  const countEl = document.getElementById('postCount');
+  const catBtns = [...document.querySelectorAll('[data-cat]')].filter((b) => b.tagName === 'BUTTON');
+  const tagBtns = [...document.querySelectorAll('[data-tag]')];
+  const cards = [...document.querySelectorAll('#postGrid .post')];
+  let cat = 'all', tag = null;
+
+  function apply() {
+    let shown = 0;
+    cards.forEach((card) => {
+      const cardCat = card.getAttribute('data-cat');
+      const cardTags = (card.getAttribute('data-tags') || '').split(',');
+      const ok = (cat === 'all' || cardCat === cat) && (!tag || cardTags.includes(tag));
+      card.style.display = ok ? '' : 'none';
+      if (ok) shown++;
+    });
+    if (empty) empty.style.display = shown === 0 ? '' : 'none';
+    if (countEl) countEl.textContent = String(shown);
+    catBtns.forEach((b) => b.classList.toggle('on', b.getAttribute('data-cat') === cat));
+    tagBtns.forEach((b) => b.classList.toggle('on', b.getAttribute('data-tag') === tag));
+  }
+
+  catBtns.forEach((b) =>
+    b.addEventListener('click', () => {
+      cat = b.getAttribute('data-cat');
+      apply();
+    })
+  );
+  tagBtns.forEach((b) =>
+    b.addEventListener('click', () => {
+      const t = b.getAttribute('data-tag');
+      tag = tag === t ? null : t;
+      apply();
+    })
+  );
+  apply();
+</script>

@@ -1,0 +1,13 @@
+---
+// 全站裝飾：掃描線（可選）、沿邊框爬行的 Slimo、主題切換 wipe 容器。
+import Slimo from './Slimo.astro';
+interface Props { crawler?: boolean; scanlines?: boolean; }
+const { crawler = true, scanlines = false } = Astro.props;
+---
+{scanlines && <div class="scan"></div>}
+{crawler && (
+  <div class="crawler" id="crawler">
+    <Slimo sprite="slime" size={54} label="Slimo 沿邊框爬行" />
+  </div>
+)}
+<div class="wipe" id="wipe"></div>

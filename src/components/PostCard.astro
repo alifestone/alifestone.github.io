@@ -1,0 +1,19 @@
+---
+import type { Post } from '../lib/posts';
+import { catClass, fmtDate } from '../lib/posts';
+interface Props { post: Post; }
+const { post } = Astro.props;
+const { title, category, date, excerpt, tags } = post.data;
+const href = `/posts/${post.slug}/`;
+---
+<article class="card post lift">
+  <div class="fx ac jb">
+    <span class={`chip px ${catClass(category)}`}>{category}</span>
+    <span class="date px">{fmtDate(date)}</span>
+  </div>
+  <h3 class="px ptitle"><a href={href}>{title}</a></h3>
+  <p class="excerpt sub m0 mt8">{excerpt}</p>
+  <div class="fx ac gap10 wrap mt12">
+    {tags.map((t) => <span class="tag mono">#{t}</span>)}
+  </div>
+</article>

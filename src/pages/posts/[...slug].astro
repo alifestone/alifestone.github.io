@@ -1,0 +1,88 @@
+---
+import { getCollection } from 'astro:content';
+import { Image } from 'astro:assets';
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import Slimo from '../../components/Slimo.astro';
+import { getSortedPosts, catClass, fmtDate } from '../../lib/posts';
+
+export async function getStaticPaths() {
+  const posts = await getCollection('posts', ({ data }) => !data.draft);
+  const sorted = posts.sort((a, b) => b.data.date.getTime() - a.data.date.getTime());
+  return sorted.map((post, i) => ({
+    params: { slug: post.slug },
+    props: { post, prev: sorted[i + 1] ?? null, next: sorted[i - 1] ?? null },
+  }));
+}
+
+const { post, prev, next } = Astro.props;
+const { Content, headings } = await post.render();
+const { title, category, date, excerpt, tags, cover, coverAlt, readMin } = post.data;
+// 只取 h2/h3 做目錄
+const toc = headings.filter((h) => h.depth === 2 || h.depth === 3);
+---
+<BaseLayout current="posts" title={`${title} — debug.log`} description={excerpt}>
+  <div class="container">
+    <div class="artgrid">
+      <div class="artcol">
+        <header class="ahead">
+          <div class="fx ac gap12">
+            <span class={`chip px ${catClass(category)}`}>{category}</span>
+            <span class="date px">{fmtDate(date)}{readMin ? ` · ${readMin} min read` : ''}</span>
+          </div>
+          <h1 class="px atitle">{title}</h1>
+          <p class="alede sub">{excerpt}</p>
+          <div class="fx ac gap10 wrap">
+            {tags.map((t) => <span class="tag mono">#{t}</span>)}
+          </div>
+          {cover && (
+            <div class="cover">
+              <Image src={cover} alt={coverAlt ?? title} />
+            </div>
+          )}
+        </header>
+
+        <article class="prose">
+          <Content />
+        </article>
+      </div>
+
+      <aside class="toccol">
+        {toc.length > 0 && (
+          <div class="card sidecard">
+            <h4 class="px sidetitle">目錄</h4>
+            {toc.map((h) => (
+              <a href={`#${h.slug}`} class={`tocitem${h.depth === 3 ? ' toch3' : ''}`}>{h.text}</a>
+            ))}
+          </div>
+        )}
+        <div class="card sidecard">
+          <div class="fx ac gap12">
+            <Slimo sprite="slime" size={54} class="noshrink" label="Slimo 頭像" />
+            <div>
+              <p class="px fs14 fw7 m0">阿哲 / bit.o</p>
+              <p class="sub fs12 m0" style="margin-top:2px">機器人研究生 @ IDLab</p>
+            </div>
+          </div>
+          <div class="fx ac gap10 mt12 px fs13"><a href="#">GitHub</a><span class="sub">/</span><a href="#">RSS</a></div>
+        </div>
+      </aside>
+    </div>
+
+    <nav class="pn">
+      {prev ? (
+        <a href={`/posts/${prev.slug}/`} class="card pncard lift">
+          <span class="pnlabel px">← 上一篇</span>
+          <p class="pntitle m0">{prev.data.title}</p>
+        </a>
+      ) : <span></span>}
+      {next ? (
+        <a href={`/posts/${next.slug}/`} class="card pncard lift" style="text-align:right">
+          <span class="pnlabel px">下一篇 →</span>
+          <p class="pntitle m0">{next.data.title}</p>
+        </a>
+      ) : <span></span>}
+    </nav>
+
+    <div class="tc" style="margin:0 0 56px"><a href="/posts/" class="morebtn px lift">← 回文章列表</a></div>
+  </div>
+</BaseLayout>

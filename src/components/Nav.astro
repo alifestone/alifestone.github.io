@@ -1,0 +1,24 @@
+---
+// 頂部導覽列。current 用來高亮當前頁（home / posts / projects / about）。
+import Slimo from './Slimo.astro';
+interface Props { current?: string; }
+const { current = '' } = Astro.props;
+const links = [
+  { key: 'home', label: '首頁', href: '/' },
+  { key: 'posts', label: '文章', href: '/posts/' },
+  { key: 'projects', label: '專案', href: '/projects/' },
+  { key: 'about', label: '關於', href: '/about/' },
+];
+---
+<nav class="nav fx ac jb">
+  <a href="/" class="fx ac gap10">
+    <Slimo sprite="slime" size={36} label="Slimo — debug.log" />
+    <span class="px fs20 fw7">debug.log</span>
+  </a>
+  <div class="fx ac gap12 px">
+    {links.map((l) => (
+      <a href={l.href} class={`navlink${current === l.key ? ' on' : ''}`}>{l.label}</a>
+    ))}
+    <button class="tbtn pointer" id="themeBtn">◼ DARK</button>
+  </div>
+</nav>

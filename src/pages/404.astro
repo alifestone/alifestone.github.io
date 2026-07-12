@@ -1,0 +1,21 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+import Slimo from '../components/Slimo.astro';
+---
+<BaseLayout title="404 — debug.log" siteClass="nf-site" scanlines={true}>
+  <main class="center container w100 bbox">
+    <div class="slimebox" data-boing title="……別戳了，牠已經很沮喪了">
+      <div class="trail">
+        <Slimo sprite="trail1" w={6} h={3} size={30} label="" />
+        <Slimo sprite="trail2" w={9} h={4} size={45} label="" />
+        <Slimo sprite="trail3" w={13} h={5} size={65} label="" />
+      </div>
+      <Slimo sprite="puddle" w={30} h={9} size={180} class="puddle" label="" />
+      <Slimo sprite="slimeLost" w={18} h={14} size={126} class="bigslime" label="迷路的 Slimo" />
+    </div>
+    <h1 class="px code404">404</h1>
+    <p class="mono errlog m0"><b>// ERROR:</b> page not found — Slimo 也找不到這頁</p>
+    <p class="sub fs13 m0" style="margin-top:6px">牠沿著整個網站的邊框爬了三圈，還是沒有找到。</p>
+    <a href="/" class="morebtn px" style="margin-top:26px">← 回首頁</a>
+  </main>
+</BaseLayout>

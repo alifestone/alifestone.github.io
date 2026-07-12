@@ -1,0 +1,65 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+import Slimo from '../components/Slimo.astro';
+
+const doings = [
+  { cat: '機器人', cls: 'c-robo', title: '機器人研究', desc: '在 IDLab 做模仿學習與視覺抓取，主力是 LeRobot 生態系與 SmolVLA 微調，讓機械手臂學會處理透明物件這類麻煩案例。' },
+  { cat: '資安 CTF', cls: 'c-ctf', title: '資安 CTF', desc: '主攻 pwn 與 reverse，常駐 picoCTF 與校內賽。喜歡把 exploit 寫成能重播的腳本，而不是一次性的魔法。' },
+  { cat: '強化學習', cls: 'c-rl', title: '強化學習', desc: '從零手刻演算法派：不先讀懂 PPO 的每一行推導，就不准自己 import stable-baselines。' },
+  { cat: '日本語', cls: 'c-jp', title: '日文學習', desc: '目標 JLPT N2。動機一半是讀日文論文與技術書，另一半是不想再等遊戲中文化。' },
+];
+const skills = ['PyTorch', 'ROS2', 'LeRobot', 'SmolVLA', 'pwntools', 'Ghidra', 'gdb + pwndbg', 'Python', 'C / C++', 'Docker', 'gymnasium', 'Anki'];
+const timeline = [
+  { year: '2026', txt: 'SmolVLA 透明物件抓取實驗，成功率 12% → 74%；部落格 debug.log 開站。' },
+  { year: '2025', txt: '加入 IDLab 攻讀碩士，研究方向定為模仿學習；開始用 LeRobot 收集實機資料。' },
+  { year: '2024', txt: '第一次打進 CTF 決賽（校際賽 pwn 組），從此掉進二進位的坑。' },
+  { year: '2023', txt: '大學專題用 DQN 玩 Atari，發現調 reward 比寫程式難十倍。' },
+];
+---
+<BaseLayout current="about" title="關於我 — debug.log">
+  <main class="container">
+    <header class="abouthero">
+      <div class="avbox"><Slimo sprite="slime" size={96} label="Slimo 頭像" /></div>
+      <div>
+        <p class="px sub fs13 m0">// whoami</p>
+        <h1 class="px name">阿哲 / bit.o</h1>
+        <p class="px role m0"><span class="chip c-robo px">機器人研究生 @ IDLab</span></p>
+        <p class="bio sub">白天在實驗室讓機械手臂學抓東西，晚上打 CTF 解 pwn 題。這個部落格記錄我在模仿學習、強化學習與資安路上踩過的坑——寫下來的目的很單純：下次踩到同一個坑時，至少 Google 得到自己。偶爾也會出現日文學習筆記，因為論文跟遊戲都逃不掉日文。</p>
+        <div class="fx ac gap12 mt16 px"><a href="#" class="soc">GitHub</a><a href="#" class="soc">RSS</a><a href="#" class="soc">Email</a></div>
+      </div>
+    </header>
+
+    <section class="section">
+      <h2 class="px sechead">我在做什麼</h2>
+      <div class="dogrid">
+        {doings.map((d) => (
+          <div class="card docard lift">
+            <span class={`chip px ${d.cls}`}>{d.cat}</span>
+            <h3 class="px doname">{d.title}</h3>
+            <p class="dodesc sub">{d.desc}</p>
+          </div>
+        ))}
+      </div>
+    </section>
+
+    <section class="section">
+      <h2 class="px sechead">技能 / 工具</h2>
+      <div class="fx wrap gap10">
+        {skills.map((s) => <span class="tagchip mono">{s}</span>)}
+      </div>
+    </section>
+
+    <section class="section">
+      <h2 class="px sechead">時間線</h2>
+      <div class="tl">
+        {timeline.map((t) => (
+          <div class="tlrow">
+            <span class="tldot"></span>
+            <span class="px tlyear">{t.year}</span>
+            <p class="tltxt sub">{t.txt}</p>
+          </div>
+        ))}
+      </div>
+    </section>
+  </main>
+</BaseLayout>

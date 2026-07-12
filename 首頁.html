@@ -1,0 +1,327 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+<meta charset="utf-8">
+<title>debug.log — 普通人類的觀察日記</title>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=DotGothic16&family=Noto+Sans+TC:wght@400;500;700&family=JetBrains+Mono:wght@400;700&display=swap" rel="stylesheet">
+<style>
+*{box-sizing:border-box}
+body{margin:0}
+.fx{display:flex}
+.ac{align-items:center}
+.jb{justify-content:space-between}
+.wrap{flex-wrap:wrap}
+.tc{text-align:center}
+.gap8{gap:8px}.gap10{gap:10px}.gap12{gap:12px}.gap16{gap:16px}
+.m0{margin:0}
+.mt8{margin-top:8px}.mt12{margin-top:12px}.mt16{margin-top:16px}
+.pointer{cursor:pointer}
+.noshrink{flex-shrink:0}
+.fs12{font-size:12px}.fs13{font-size:13px}.fs15{font-size:15px}.fs16{font-size:16px}.fs20{font-size:20px}
+.fw7{font-weight:700}
+
+.site{min-height:100vh;background:var(--bg);color:var(--ink);font-family:'Noto Sans TC',sans-serif;transition:background .25s,color .25s}
+.light{--bg:#F6F1E7;--surface:#FFFDF8;--ink:#16161E;--sub:#6E6A7C;--line:#16161E;--chip:#EDE6D6;--codebg:#16161E;--codeink:#7EE8C7}
+.dark{--bg:#12121B;--surface:#1C1C29;--ink:#EDEAF6;--sub:#9A96AC;--line:#07070C;--chip:#262536;--codebg:#0B0B12;--codeink:#7EE8C7}
+.site a{color:var(--ink);text-decoration:none}
+.site a:hover{color:var(--accent)}
+.px{font-family:'DotGothic16','Noto Sans TC',monospace}
+.mono{font-family:'JetBrains Mono',monospace}
+.pxc{image-rendering:pixelated;display:block}
+.sub{color:var(--sub)}
+.card{background:var(--surface);border:3px solid var(--line);box-shadow:6px 6px 0 var(--line);transition:transform .12s steps(2,end),box-shadow .12s steps(2,end)}
+.lift:hover{transform:translate(-3px,-3px);box-shadow:9px 9px 0 var(--line)}
+.nav{position:sticky;top:0;z-index:50;background:var(--bg);border-bottom:3px solid var(--line);padding:12px 28px;transition:background .25s}
+.navlink{padding:4px 8px;font-size:15px}
+.navlink.on{background:var(--accent);color:#16161E;border:2px solid var(--line);box-shadow:3px 3px 0 var(--line)}
+.tbtn{background:var(--surface);color:var(--ink);border:2px solid var(--line);box-shadow:3px 3px 0 var(--line);padding:6px 12px;font-size:13px;font-family:'DotGothic16',monospace}
+.tbtn:hover{background:var(--accent);color:#16161E}
+.tbtn:active{transform:translate(2px,2px);box-shadow:1px 1px 0 var(--line)}
+.container{max-width:1120px;margin:0 auto;padding:0 28px}
+.hero{padding:56px 0 40px}
+.herotitle{font-size:clamp(30px,4.5vw,52px);line-height:1.25;margin:10px 0 14px}
+.mark{background:var(--accent);color:#16161E;padding:0 6px;border:2px solid var(--line)}
+.maingrid{display:grid;grid-template-columns:1fr 300px;gap:32px;align-items:start;padding-bottom:64px}
+.postgrid{display:grid;grid-template-columns:1fr 1fr;gap:24px}
+.post{padding:20px}
+.fcard{padding:26px;margin-bottom:24px}
+.ftitle{font-size:26px;margin:12px 0 8px}
+.excerpt{font-size:14px;line-height:1.75;margin:8px 0 14px}
+.chip{border:2px solid var(--line);padding:2px 8px;font-size:12px;color:#16161E}
+.c-robo{background:#7EE8C7}.c-ctf{background:#FF8A8A}.c-rl{background:#FFC145}.c-jp{background:#C4B5FD}
+.date{font-size:12px;color:var(--sub)}
+.tag{font-size:12px;color:var(--sub)}
+.tag:hover{color:var(--accent);cursor:pointer}
+.codeblock{background:var(--codebg);color:var(--codeink);border:3px solid var(--line);padding:12px 14px;font-size:12.5px;line-height:1.7;overflow:auto;box-shadow:6px 6px 0 var(--line);white-space:pre-wrap;word-break:break-word}
+.side{display:grid;gap:24px}
+.sidecard{padding:20px}
+.sidetitle{font-size:15px;margin:0 0 12px;border-bottom:3px solid var(--line);padding-bottom:8px}
+.catrow{padding:7px 0;font-size:14px;border-bottom:2px dashed var(--chip)}
+.sq{width:12px;height:12px;border:2px solid var(--line);display:inline-block}
+.count{font-size:12px;color:var(--sub)}
+.tagchip{background:var(--chip);border:2px solid var(--line);padding:3px 8px;font-size:12px;cursor:pointer}
+.tagchip:hover{background:var(--accent);color:#16161E}
+.site .morebtn{display:inline-block;background:var(--ink);color:var(--bg);border:3px solid var(--line);box-shadow:5px 5px 0 var(--line);padding:10px 22px;font-size:14px}
+.morebtn:hover{background:var(--accent);color:#16161E}
+.footer{border-top:3px solid var(--line);padding:22px 28px;font-size:13px}
+.crawler{position:fixed;left:0;top:0;z-index:60;pointer-events:none;will-change:transform}
+.wipe{position:fixed;inset:0;z-index:99;display:grid;grid-template-columns:repeat(12,1fr);grid-template-rows:repeat(7,1fr);pointer-events:none}
+.wcell{background:var(--line);opacity:0;transition:opacity .14s steps(2,end)}
+.wipe.in .wcell{opacity:1}
+.scan{position:fixed;inset:0;z-index:55;pointer-events:none;background:repeating-linear-gradient(0deg,rgba(0,0,0,.06) 0 1px,transparent 1px 3px)}
+@media (max-width:900px){.maingrid{grid-template-columns:1fr}.postgrid{grid-template-columns:1fr}.hero{padding:36px 0 28px}}
+</style>
+</head>
+<body>
+<div class="site light" id="root" data-screen-label="首頁">
+
+<nav class="nav fx ac jb">
+  <a href="#" class="fx ac gap10">
+    <canvas width="18" height="12" style="width:36px;height:24px" class="pxc" id="logoCanvas" title="Slimo" role="img" aria-label="Slimo 吉祥物"></canvas>
+    <span class="px fs20 fw7">debug.log</span>
+  </a>
+  <div class="fx ac gap12 px">
+    <a href="#" class="navlink on">首頁</a>
+    <a href="#" class="navlink">文章</a>
+    <a href="#" class="navlink">專案</a>
+    <a href="#" class="navlink">關於</a>
+    <button class="tbtn pointer" id="themeBtn">◼ DARK</button>
+  </div>
+</nav>
+
+<header class="hero"><div class="container">
+  <p class="px sub fs13 m0">// robotics × security × RL × 日本語</p>
+  <h1 class="px herotitle m0">普通人類的觀察日記</h1>
+  <p class="sub fs15 m0" style="max-width:560px;line-height:1.8">機器人研究筆記（IDLab / LeRobot / SmolVLA）、資安 CTF writeup、強化學習實作，以及偶爾出現的日文學習心得。</p>
+</div></header>
+
+<main class="container maingrid">
+  <div>
+    <article class="card fcard lift">
+      <div class="fx ac jb">
+        <span class="fx ac gap8">
+          <span class="chip px c-robo">機器人</span>
+          <span class="chip px" style="background:var(--chip);color:var(--ink)">最新</span>
+        </span>
+        <span class="date px">2026-07-05</span>
+      </div>
+      <h2 class="px ftitle"><a href="#">SmolVLA 微調實戰：讓機械手臂學會抓取透明物件</a></h2>
+      <p class="excerpt sub">透明物件一直是視覺抓取的惡夢——深度相機看不到、RGB 特徵又少。這篇記錄我如何用 LeRobot 收集 150 個 episode，微調 SmolVLA 之後把成功率從 12% 拉到 74%。</p>
+      <pre class="codeblock mono m0">$ python lerobot/scripts/train.py \
+    --policy.path=lerobot/smolvla_base \
+    --dataset.repo_id=bitolog/grasp_transparent \
+    --steps=20000
+# success_rate: 0.12 → 0.74 ✔</pre>
+      <div class="fx ac jb mt16">
+        <div class="fx ac gap10 wrap">
+          <span class="tag mono">#SmolVLA</span><span class="tag mono">#LeRobot</span><span class="tag mono">#fine-tuning</span>
+        </div>
+        <a href="#" class="px fs13 fw7">閱讀全文 →</a>
+      </div>
+    </article>
+
+    <div class="postgrid" id="postGrid"></div>
+
+    <div class="tc" style="margin-top:36px"><a href="#" class="morebtn px lift">更多文章 →</a></div>
+  </div>
+
+  <aside class="side">
+    <div class="card sidecard">
+      <div class="fx ac gap16">
+        <canvas width="18" height="12" style="width:72px;height:48px" class="pxc noshrink" id="avatarCanvas" title="Slimo" role="img" aria-label="Slimo 吉祥物"></canvas>
+        <div>
+          <p class="px fs16 fw7 m0">阿哲 / bit.o</p>
+          <p class="sub fs12 m0" style="margin-top:4px">機器人研究生 @ IDLab</p>
+        </div>
+      </div>
+      <p class="sub fs13 mt12 m0" style="line-height:1.8">白天讓機械手臂學抓東西，晚上解 pwn 題。相信像素跟梯度都能下降到對的地方。</p>
+      <div class="fx ac gap10 mt12 px fs13"><a href="#">GitHub</a><span class="sub">/</span><a href="#">RSS</a><span class="sub">/</span><a href="#">Email</a></div>
+    </div>
+
+    <div class="card sidecard">
+      <h4 class="px sidetitle">分類</h4>
+      <div id="catList"></div>
+    </div>
+
+    <div class="card sidecard">
+      <h4 class="px sidetitle">標籤</h4>
+      <div class="fx wrap gap8" id="tagList"></div>
+    </div>
+  </aside>
+</main>
+
+<footer class="footer"><div class="container fx ac jb wrap gap12" style="padding:0">
+  <span class="px sub">© 2026 debug.log — 手刻像素，一格一格。</span>
+  <span class="px sub fs12">Powered by coffee ▪ gradient descent ▪ 42</span>
+</div></footer>
+
+<div class="crawler" id="crawler"><canvas width="18" height="12" style="width:54px;height:36px" class="pxc" id="crawlCanvas" title="Slimo" role="img" aria-label="Slimo 沿邊框爬行"></canvas></div>
+
+<div class="wipe" id="wipe"></div>
+
+</div>
+
+<script>
+(function(){
+  var posts = [
+    { cat: '資安 CTF', cls: 'c-ctf', date: '2026-06-28', title: 'picoCTF 2026 Pwn 題解：從 ret2libc 到 heap feng shui', excerpt: '三題 pwn 的完整 writeup，重點放在如何用 pwntools 快速迭代 exploit，以及 heap 佈局的視覺化思路。', tags: ['pwn', 'pwntools', 'writeup'] },
+    { cat: '強化學習', cls: 'c-rl', date: '2026-06-19', title: 'PPO 從零開始：一步步推導 clip objective', excerpt: '不依賴任何 RL 函式庫，從 policy gradient 推到 PPO-Clip，再用 200 行 PyTorch 在 CartPole 上驗證。', tags: ['PPO', 'PyTorch'] },
+    { cat: '機器人', cls: 'c-robo', date: '2026-06-11', title: 'IDLab 研究日誌：模仿學習資料集收集踩坑記', excerpt: '遙操作收資料看似簡單，實際上 30% 的 episode 都不能用。記錄我們如何設計資料品質檢查 pipeline。', tags: ['imitation-learning', 'dataset'] },
+    { cat: '日本語', cls: 'c-jp', date: '2026-06-03', title: 'N2 文法筆記：「〜ばかりに」與「〜だけに」', excerpt: '兩個長得像、意思差很多的文法。整理語感差異、例句，以及我在模擬考錯過的陷阱題。', tags: ['JLPT', 'N2', '文法'] },
+    { cat: '資安 CTF', cls: 'c-ctf', date: '2026-05-27', title: 'Reverse 入門：用 Ghidra 拆解一個 CrackMe', excerpt: '給第一次開 Ghidra 的人：從找 main、重新命名變數，到還原出驗證演算法的完整流程。', tags: ['reverse', 'Ghidra'] },
+    { cat: '機器人', cls: 'c-robo', date: '2026-05-18', title: 'LeRobot 環境建置：從模擬到實機的 checklist', excerpt: '整理一份從 gym 模擬環境切到 SO-100 實機時，每次都會忘記的設定與校準步驟清單。', tags: ['LeRobot', 'SO-100'] }
+  ];
+  var cats = [
+    { name: '機器人', color: '#7EE8C7', n: 18 },
+    { name: '資安 CTF', color: '#FF8A8A', n: 12 },
+    { name: '強化學習', color: '#FFC145', n: 9 },
+    { name: '日本語', color: '#C4B5FD', n: 7 }
+  ];
+  var tags = ['LeRobot', 'SmolVLA', 'pwn', 'PPO', 'ROS2', 'JLPT', 'Ghidra', 'imitation-learning', 'CTF', 'PyTorch'];
+
+  var postGrid = document.getElementById('postGrid');
+  posts.forEach(function(p){
+    var art = document.createElement('article');
+    art.className = 'card post lift';
+    var tagsHtml = p.tags.map(function(t){ return '<span class="tag mono">#' + t + '</span>'; }).join('');
+    art.innerHTML =
+      '<div class="fx ac jb"><span class="chip px ' + p.cls + '">' + p.cat + '</span><span class="date px">' + p.date + '</span></div>' +
+      '<h3 class="fs16 fw7" style="margin:12px 0 0;line-height:1.5"><a href="#">' + p.title + '</a></h3>' +
+      '<p class="excerpt sub m0 mt8">' + p.excerpt + '</p>' +
+      '<div class="fx ac gap10 wrap mt12">' + tagsHtml + '</div>';
+    postGrid.appendChild(art);
+  });
+
+  var catList = document.getElementById('catList');
+  cats.forEach(function(c){
+    var row = document.createElement('div');
+    row.className = 'catrow fx ac jb';
+    row.innerHTML =
+      '<a href="#" class="fx ac gap10"><span class="sq" style="background:' + c.color + '"></span>' + c.name + '</a>' +
+      '<span class="count mono">' + c.n + '</span>';
+    catList.appendChild(row);
+  });
+
+  var tagList = document.getElementById('tagList');
+  tags.forEach(function(t){
+    var span = document.createElement('span');
+    span.className = 'tagchip mono';
+    span.textContent = t;
+    tagList.appendChild(span);
+  });
+
+  // Slimo — 站點吉祥物（階段2 定稿）。淺色主題用珊瑚色 PAL_CORAL，深色主題用藍色 PAL_BLUE。
+  // 造型定稿見 首頁-selection.png / 首頁-selection_dark_mode.png，與下方 SLIME 陣列 1:1 對應。
+  var PAL_BLUE  = { K:'#10101A', B:'#45C6F0', D:'#1E6BD6', E:'#0C2F8F', W:'#FFFFFF', C:'#CFF6FF' };
+  var PAL_CORAL = { K:'#10101A', B:'#FF8A70', D:'#E0503A', E:'#8C1F33', W:'#FFFFFF', C:'#FFD9CC' };
+  var SLIME = [
+    '......KKKKKK......',
+    '....KKDDDDDDKK....',
+    '...KDDBBBBBBDDK...',
+    '..KDBBWBBBBBBBDK..',
+    '.KDBWWWBBBBBBBBDK.',
+    '.KBBBWBBCBBBBBBBK.',
+    'KDBBBBBBBCBBBBBBDK',
+    'KBBBBBBBBWEEBWEEBK',
+    'KBBBBBBBBBEEBBEEBK',
+    'KDBBBBBBBBEEBBEEDK',
+    '.KDDBBBBBBBBBBDDK.',
+    '.KKKKKKKKKKKKKKKK.'
+  ];
+
+  var state = { theme: 'light' };
+  var accent = '#3EBD93';
+
+  function slimePal(){ return state.theme === 'dark' ? PAL_BLUE : PAL_CORAL; }
+
+  function drawMap(canvas, rows){
+    if (!canvas) return;
+    var ctx = canvas.getContext('2d');
+    var pal = slimePal();
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+    rows.forEach(function(row, y){
+      for (var x = 0; x < row.length; x++){
+        var c = pal[row[x]];
+        if (c){ ctx.fillStyle = c; ctx.fillRect(x, y, 1, 1); }
+      }
+    });
+  }
+
+  var logoCanvas = document.getElementById('logoCanvas');
+  var avatarCanvas = document.getElementById('avatarCanvas');
+  var crawlCanvas = document.getElementById('crawlCanvas');
+  var crawlerEl = document.getElementById('crawler');
+  var rootEl = document.getElementById('root');
+
+  function redrawAll(){
+    drawMap(logoCanvas, SLIME);
+    drawMap(avatarCanvas, SLIME);
+    drawMap(crawlCanvas, SLIME);
+  }
+
+  function applyAccent(){
+    rootEl.style.setProperty('--accent', accent);
+  }
+
+  applyAccent();
+  redrawAll();
+
+  var themeBtn = document.getElementById('themeBtn');
+  var wipeEl = document.getElementById('wipe');
+  var wiping = false;
+  var wipeCells = Array.from({ length: 84 }, function(_, i){
+    var x = i % 12, y = Math.floor(i / 12);
+    return (((x * 3 + y * 5) % 7) * 45) + 'ms';
+  });
+  wipeCells.forEach(function(delay){
+    var cell = document.createElement('div');
+    cell.className = 'wcell';
+    cell.style.transitionDelay = delay;
+    wipeEl.appendChild(cell);
+  });
+
+  function toggleTheme(){
+    if (wiping) return;
+    wiping = true;
+    wipeEl.classList.remove('in');
+    setTimeout(function(){ wipeEl.classList.add('in'); }, 20);
+    setTimeout(function(){
+      state.theme = state.theme === 'light' ? 'dark' : 'light';
+      rootEl.classList.remove('light', 'dark');
+      rootEl.classList.add(state.theme);
+      themeBtn.textContent = state.theme === 'light' ? '◼ DARK' : '◻ LIGHT';
+      redrawAll();
+    }, 380);
+    setTimeout(function(){
+      wipeEl.classList.remove('in');
+      wiping = false;
+    }, 800);
+  }
+  themeBtn.addEventListener('click', toggleTheme);
+
+  var t0 = performance.now();
+  var SPEED = 55, S = 54, SH = 36;
+  function step(now){
+    requestAnimationFrame(step);
+    var W = window.innerWidth, H = window.innerHeight;
+    var L1 = W - S, L2 = H - SH, per = 2 * (L1 + L2);
+    var t = (now - t0) / 1000;
+    var d = (t * SPEED) % per, x, y, r;
+    if (d < L1) { x = d; y = H - SH; r = 0; }
+    else if (d < L1 + L2) { x = W - S + 3; y = H - SH - (d - L1); r = -90; }
+    else if (d < 2 * L1 + L2) { x = W - S - (d - L1 - L2); y = -3; r = 180; }
+    else { x = -3; y = d - 2 * L1 - L2; r = 90; }
+    var ph = Math.abs(Math.sin(t * 6));
+    var hop = -ph * 7;
+    var sy = 0.82 + 0.26 * ph, sx = 1 / sy;
+    crawlerEl.style.transform = 'translate(' + x + 'px,' + y + 'px) rotate(' + r + 'deg) translateY(' + hop + 'px)';
+    crawlCanvas.style.transformOrigin = '50% 100%';
+    crawlCanvas.style.transform = 'scale(' + sx.toFixed(3) + ',' + sy.toFixed(3) + ')';
+  }
+  requestAnimationFrame(step);
+})();
+</script>
+</body>
+</html>

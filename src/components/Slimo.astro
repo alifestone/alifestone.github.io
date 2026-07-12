@@ -1,0 +1,28 @@
+---
+// Slimo 像素吉祥物 canvas。實際繪製由 src/scripts/site.js 依 data-slime 掃描繪出。
+// props：
+//   sprite  — 精靈名稱（slime / slimeLost / puddle / trail1..3），預設 slime
+//   w/h     — 精靈原生像素尺寸（slime 為 18×12）
+//   size    — CSS 顯示寬度(px)，高度依原生比例自動換算
+//   class   — 額外 class
+interface Props {
+  sprite?: string;
+  w?: number;
+  h?: number;
+  size?: number;
+  class?: string;
+  label?: string;
+}
+const { sprite = 'slime', w = 18, h = 12, size = 36, class: cls = '', label = 'Slimo 吉祥物' } = Astro.props;
+const dispW = size;
+const dispH = Math.round((size * h) / w);
+---
+<canvas
+  width={w}
+  height={h}
+  data-slime={sprite}
+  class={`pxc ${cls}`}
+  style={`width:${dispW}px;height:${dispH}px`}
+  role="img"
+  aria-label={label}
+></canvas>

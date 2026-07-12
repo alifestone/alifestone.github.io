@@ -90,7 +90,9 @@ footer{border-top:3px solid var(--line);padding:28px 0;margin-top:60px;color:var
     <li><a href="#category">5. 新增分類（機器人 / 開發 / claude / certification …）</a></li>
     <li><a href="#images">6. 放圖片與封面</a></li>
     <li><a href="#deploy">7. 發佈上線</a></li>
-    <li><a href="#faq">8. 常見問題</a></li>
+    <li><a href="#content">8. 改「非文章」內容（首頁卡片、關於頁…）</a></li>
+    <li><a href="#navpage">9. 導覽列新增一個頁面</a></li>
+    <li><a href="#faq">10. 常見問題</a></li>
   </ol>
 </nav>
 
@@ -286,8 +288,95 @@ git push</code></pre>
 </section>
 
 <!-- 8 -->
+<section id="content">
+  <h2 class="sec px">8. 改「非文章」內容（首頁卡片、關於頁…）</h2>
+  <p>文章是 Markdown，但網站上還有一堆<strong>不是文章</strong>的固定內容——首頁英雄區文案、Slimo 個人卡片、關於頁的自我介紹與時間線等等。這些直接寫在對應的 <span class="file">.astro</span> 頁面檔裡，改法就是打開檔案、找到那段文字改掉。以下是「哪段內容在哪個檔」的對照。</p>
+
+  <table>
+    <thead><tr><th>想改的東西</th><th>檔案</th><th>找什麼</th></tr></thead>
+    <tbody>
+      <tr><td>首頁最上方標語 / 大標 / 介紹句</td><td><span class="file">src/pages/index.astro</span></td><td><code>class="hero"</code> 區塊裡的 <code>&lt;h1&gt;</code> 與 <code>&lt;p&gt;</code></td></tr>
+      <tr><td>首頁 Slimo 卡片（名字、頭銜、簡介、GitHub/RSS/Email 連結）</td><td><span class="file">src/pages/index.astro</span></td><td><code>class="sidecard"</code> 第一張卡</td></tr>
+      <tr><td>關於頁的名字、標籤、自我介紹、社群連結</td><td><span class="file">src/pages/about.astro</span></td><td><code>class="abouthero"</code> 區塊</td></tr>
+      <tr><td>關於頁「我在做什麼」「技能」「證照」「時間線」</td><td><span class="file">src/pages/about.astro</span></td><td>檔案頂端 <code>---</code> 之間的 <code>doings</code> / <code>skills</code> / <code>certs</code> / <code>timeline</code> 陣列</td></tr>
+      <tr><td>頁尾文字</td><td><span class="file">src/components/Footer.astro</span></td><td>整個檔案</td></tr>
+      <tr><td>導覽列（logo 文字、連結）</td><td><span class="file">src/components/Nav.astro</span></td><td><code>links</code> 陣列（見 <a href="#navpage">第 9 節</a>）</td></tr>
+    </tbody>
+  </table>
+
+  <h3>兩種改法：純文字 vs. 資料陣列</h3>
+  <p>Astro 頁面分兩塊：檔案頂端用兩行 <code>---</code> 包起來的是 <strong>JavaScript（frontmatter script）</strong>，下面是 <strong>HTML 模板</strong>。內容可能寫在任一邊：</p>
+
+  <div class="step"><span class="num px">1</span>
+    <strong>寫死在 HTML 裡的文字</strong> — 直接在 <code>---</code> 底下的模板找到那句話改掉即可。例如首頁 Slimo 卡片的名字與頭銜：
+    <pre><code>&lt;p class="px fs16 fw7 m0"&gt;lifestone / bit.o&lt;/p&gt;
+&lt;p class="sub fs12 m0" style="margin-top:4px"&gt;師大資工&lt;/p&gt;</code></pre>
+    把 <code>lifestone / bit.o</code>、<code>師大資工</code> 換成你要的字就好。
+  </div>
+
+  <div class="step"><span class="num px">2</span>
+    <strong>放在資料陣列裡的內容</strong> — 像關於頁的「我在做什麼」是一個 <code>doings</code> 陣列（在頂端 <code>---</code> script 內），改文字就改陣列元素，<em>新增一項</em>就照同樣格式加一個物件：
+    <pre><code>const doings = [
+  { cat: '資安 CTF', cls: 'c-ctf', title: '資安 / CTF', desc: '……' },
+  { cat: '新的類別', cls: 'c-dev', title: '新標題', desc: '這裡寫描述。' }, // ← 新增一項
+];</code></pre>
+    <code>skills</code>、<code>certs</code>（純字串陣列）與 <code>timeline</code>（<code>{ year, txt }</code> 物件陣列）同理，照現有格式增刪即可。
+  </div>
+
+  <h3>連結怎麼寫</h3>
+  <p>連結是 HTML 的 <code>&lt;a&gt;</code>。站內頁面用開頭帶 <code>/</code> 的路徑（如 <code>/about/</code>、<code>/posts/</code>）；站外網址用完整 URL 並加 <code>target="_blank" rel="noopener"</code>（新分頁開啟）；Email 用 <code>mailto:</code>。首頁 Slimo 卡片的三個連結就是範例：</p>
+  <pre><code>&lt;a href="https://github.com/alifestone" target="_blank" rel="noopener"&gt;GitHub&lt;/a&gt;
+&lt;a href="/rss.xml"&gt;RSS&lt;/a&gt;
+&lt;a href="mailto:mses101137@gmail.com"&gt;Email&lt;/a&gt;</code></pre>
+  <div class="note">
+    <strong>RSS：</strong> <code>/rss.xml</code> 由 <span class="file">src/pages/rss.xml.js</span> 自動產生（用 <code>@astrojs/rss</code>），內容跟著文章走，不用手動維護。
+  </div>
+
+  <div class="note warn">
+    <strong>別亂動 <code>class</code> 與標籤結構：</strong> 那些 <code>class="px fs16 fw7"</code> 之類的是設計系統的樣式鉤子（定義在 <span class="file">src/styles/global.css</span>）。改<em>文字內容</em>安全；把 <code>&lt;p&gt;</code> 換成別的標籤或刪掉 class 可能會讓版面跑掉。改完記得 <code>npm run dev</code> 看淺色／深色兩種主題。
+  </div>
+</section>
+
+<!-- 9 -->
+<section id="navpage">
+  <h2 class="sec px">9. 導覽列新增一個頁面</h2>
+  <p>導覽列目前有<strong>首頁 / 文章 / 專案 / 關於</strong>四個。要新增一個頁面（例如「筆記」<code>/notes/</code>）需要兩步：<em>建立頁面檔</em> + <em>把它加進導覽列</em>。</p>
+
+  <div class="step"><span class="num px">1</span>
+    <strong>建立頁面檔</strong> — 在 <span class="file">src/pages/</span> 新增一個 <code>.astro</code> 檔，檔名就是網址。例如 <span class="file">src/pages/notes.astro</span> → 網址 <code>/notes/</code>。最省事的做法是複製現成的 <span class="file">src/pages/projects.astro</span> 來改。頁面骨架長這樣：
+    <pre><code>---
+import BaseLayout from '../layouts/BaseLayout.astro';
+---
+&lt;BaseLayout current="notes" title="筆記 — debug.log"&gt;
+  &lt;main class="container"&gt;
+    &lt;h1 class="px"&gt;筆記&lt;/h1&gt;
+    &lt;p&gt;這裡放內容。&lt;/p&gt;
+  &lt;/main&gt;
+&lt;/BaseLayout&gt;</code></pre>
+    <code>current="notes"</code> 這個字要跟下一步導覽列的 <code>key</code> 一致，當前頁才會高亮。
+  </div>
+
+  <div class="step"><span class="num px">2</span>
+    <strong>加進導覽列</strong> — 打開 <span class="file">src/components/Nav.astro</span>，在 <code>links</code> 陣列加一項（<code>key</code> = 上一步的 <code>current</code>、<code>label</code> = 顯示文字、<code>href</code> = 網址）：
+    <pre><code>const links = [
+  { key: 'home',     label: '首頁', href: '/' },
+  { key: 'posts',    label: '文章', href: '/posts/' },
+  { key: 'projects', label: '專案', href: '/projects/' },
+  { key: 'about',    label: '關於', href: '/about/' },
+  { key: 'notes',    label: '筆記', href: '/notes/' }, // ← 新增
+];</code></pre>
+    存檔後，導覽列每一頁都會出現「筆記」，點進去就是你剛建的頁面。
+  </div>
+
+  <div class="note">
+    <strong>三個要對齊的名字：</strong> 頁面檔的 <code>current="notes"</code>、<code>Nav.astro</code> 裡的 <code>key: 'notes'</code>、以及 <code>href</code> 對應的檔名 <code>notes.astro</code>——這三個對上，連結、頁面、高亮就都會正確。
+  </div>
+  <p>要<strong>移除</strong>一個頁面就反過來：把 <code>links</code> 那一項刪掉（導覽列不再顯示），需要的話再刪掉 <span class="file">src/pages/</span> 底下對應的 <code>.astro</code> 檔。</p>
+</section>
+
+<!-- 10 -->
 <section id="faq">
-  <h2 class="sec px">8. 常見問題</h2>
+  <h2 class="sec px">10. 常見問題</h2>
   <h3>文章寫好了卻沒出現？</h3>
   <ul>
     <li>檢查 <code>draft:</code> 是不是還是 <code>true</code>。</li>
